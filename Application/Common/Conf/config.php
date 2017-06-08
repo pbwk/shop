@@ -5,4 +5,6 @@ return array(
 
     'ACTION_SUFFIX' => 'Action',// 动作后缀
 
+    'DEFAULT_FILER' => '',//默认的输入过滤器
+
 );

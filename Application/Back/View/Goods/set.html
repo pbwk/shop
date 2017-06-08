@@ -43,12 +43,23 @@
                             <li class="active">
                                 <a href="#tab-general" data-toggle="tab">基本信息</a>
                             </li>
+                            <li class="">
+                                <a href="#tab-desc" data-toggle="tab">描述</a>
+                            </li>
+                            <li class="">
+                                <a href="#tab-expand" data-toggle="tab">扩展信息</a>
+                            </li>
+                            <li class="">
+                                <a href="#tab-linked" data-toggle="tab">关联信息</a>
+                            </li>
+                            <li class="">
+                                <a href="#tab-seo" data-toggle="tab">SEO信息</a>
+                            </li>
                         </ul>
                         <div class="tab-content">
-
                             <div class="tab-pane active" id="tab-general">
 
-                                                                <div class="form-group required">
+                                <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-title">名称</label>
                                     <div class="col-sm-10">
                                         <input type="text" name="title" value="{$data['title']}" placeholder="名称" id="input-title" class="form-control" />
@@ -57,6 +68,7 @@
                                         </if>
                                     </div>
                                 </div>
+
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-upc">通用代码</label>
                                     <div class="col-sm-10">
@@ -66,6 +78,7 @@
                                         </if>
                                     </div>
                                 </div>
+
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-image">图像</label>
                                     <div class="col-sm-10">
@@ -75,10 +88,27 @@
                                         </if>
                                     </div>
                                 </div>
+
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-is_on_sale-yes">上架</label>
+                                    <div class="col-sm-10">
+                                        <label for="input-is_on_sale-yes">
+                                            <input type="radio" name="is_shipping" value="1" id="input-is_on_sale-yes" class="form-control" <if condition="!isset($data['is_on_sale']) || $data['is_on_sale'] eq '1'">checked</if> />
+                                            是</label>
+                                        &nbsp;&nbsp;
+                                        <label for="input-is_on_sale-no">
+                                            <input type="radio" name="is_on_sale" value="0" id="input-is_on_sale-no" class="form-control" <if condition="$data['is_on_sale'] eq '0'">checked</if> />
+                                            否</label>
+                                    </div>
+                                </div>
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-stock_status_id">库存状态</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="stock_status_id" value="{$data['stock_status_id']}" placeholder="库存状态" id="input-stock_status_id" class="form-control" />
+                                        <select name="stock_status_id" id="input-stock_status_id" class="form-control">
+                                            <volist name="stock_status_list" id="stock_status">
+                                                <option value="{$stock_status['id']}" <if condition="$data['stock_status_id'] eq $stock_status['id']">selected</if> >{$stock_status['title']}</option>
+                                            </volist>
+                                        </select>
                                         <if condition="isset($message['stock_status_id'])">
                                             <label for="input-stock_status_id" class="text-danger">{$message['stock_status_id']}</label>
                                         </if>
@@ -87,7 +117,7 @@
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-quantity">库存</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="quantity" value="{$data['quantity']}" placeholder="库存" id="input-quantity" class="form-control" />
+                                        <input type="text" name="quantity" value="{$data['quantity']|default=0}" placeholder="库存" id="input-quantity" class="form-control" />
                                         <if condition="isset($message['quantity'])">
                                             <label for="input-quantity" class="text-danger">{$message['quantity']}</label>
                                         </if>
@@ -96,25 +126,32 @@
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-sku_id">库存单位</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="sku_id" value="{$data['sku_id']}" placeholder="库存单位" id="input-sku_id" class="form-control" />
+                                        <select name="sku_id" id="input-sku_id" class="form-control">
+                                            <volist name="sku_list" id="sku">
+                                                <option value="{$sku['id']}" <if condition="$data['sku_id'] eq $sku['id']">selected</if> >{$sku['title']}</option>
+                                            </volist>
+                                        </select>
                                         <if condition="isset($message['sku_id'])">
                                             <label for="input-sku_id" class="text-danger">{$message['sku_id']}</label>
                                         </if>
                                     </div>
                                 </div>
                                 <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-is_subtract">扣减库存</label>
+                                    <label class="col-sm-2 control-label" for="input-is_shipping-yes">扣减库存</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="is_subtract" value="{$data['is_subtract']}" placeholder="扣减库存" id="input-is_subtract" class="form-control" />
-                                        <if condition="isset($message['is_subtract'])">
-                                            <label for="input-is_subtract" class="text-danger">{$message['is_subtract']}</label>
-                                        </if>
+                                        <label for="input-is_subtract-yes">
+                                            <input type="radio" name="is_shipping" value="1" id="input-is_subtract-yes" class="form-control" <if condition="!isset($data['is_subtract']) || $data['is_subtract'] eq '1'">checked</if> />
+                                            是</label>
+                                        &nbsp;&nbsp;
+                                        <label for="input-is_subtract-no">
+                                            <input type="radio" name="is_subtract" value="0" id="input-is_subtract-no" class="form-control" <if condition="$data['is_subtract'] eq '0'">checked</if> />
+                                            否</label>
                                     </div>
                                 </div>
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-price">售价</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="price" value="{$data['price']}" placeholder="售价" id="input-price" class="form-control" />
+                                        <input type="text" name="price" value="{$data['price']|default=0}" placeholder="售价" id="input-price" class="form-control" />
                                         <if condition="isset($message['price'])">
                                             <label for="input-price" class="text-danger">{$message['price']}</label>
                                         </if>
@@ -123,156 +160,203 @@
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-price_origin">原价</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="price_origin" value="{$data['price_origin']}" placeholder="原价" id="input-price_origin" class="form-control" />
+                                        <input type="text" name="price_origin" value="{$data['price_origin']|default=0}" placeholder="原价" id="input-price_origin" class="form-control" />
                                         <if condition="isset($message['price_origin'])">
                                             <label for="input-price_origin" class="text-danger">{$message['price_origin']}</label>
                                         </if>
                                     </div>
                                 </div>
-                                <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-minimum">最少起售</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="minimum" value="{$data['minimum']}" placeholder="最少起售" id="input-minimum" class="form-control" />
-                                        <if condition="isset($message['minimum'])">
-                                            <label for="input-minimum" class="text-danger">{$message['minimum']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-is_shipping">配送支持</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="is_shipping" value="{$data['is_shipping']}" placeholder="配送支持" id="input-is_shipping" class="form-control" />
-                                        <if condition="isset($message['is_shipping'])">
-                                            <label for="input-is_shipping" class="text-danger">{$message['is_shipping']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-date_available">起售时间</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="date_available" value="{$data['date_available']}" placeholder="起售时间" id="input-date_available" class="form-control" />
-                                        <if condition="isset($message['date_available'])">
-                                            <label for="input-date_available" class="text-danger">{$message['date_available']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group ">
-                                    <label class="col-sm-2 control-label" for="input-length">长</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="length" value="{$data['length']}" placeholder="长" id="input-length" class="form-control" />
-                                        <if condition="isset($message['length'])">
-                                            <label for="input-length" class="text-danger">{$message['length']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group ">
-                                    <label class="col-sm-2 control-label" for="input-width">宽</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="width" value="{$data['width']}" placeholder="宽" id="input-width" class="form-control" />
-                                        <if condition="isset($message['width'])">
-                                            <label for="input-width" class="text-danger">{$message['width']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group ">
-                                    <label class="col-sm-2 control-label" for="input-height">高</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="height" value="{$data['height']}" placeholder="高" id="input-height" class="form-control" />
-                                        <if condition="isset($message['height'])">
-                                            <label for="input-height" class="text-danger">{$message['height']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-length_unit_id">长度单位</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="length_unit_id" value="{$data['length_unit_id']}" placeholder="长度单位" id="input-length_unit_id" class="form-control" />
-                                        <if condition="isset($message['length_unit_id'])">
-                                            <label for="input-length_unit_id" class="text-danger">{$message['length_unit_id']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-weight">重量</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="weight" value="{$data['weight']}" placeholder="重量" id="input-weight" class="form-control" />
-                                        <if condition="isset($message['weight'])">
-                                            <label for="input-weight" class="text-danger">{$message['weight']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-weight_unit_id">重量单位</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="weight_unit_id" value="{$data['weight_unit_id']}" placeholder="重量单位" id="input-weight_unit_id" class="form-control" />
-                                        <if condition="isset($message['weight_unit_id'])">
-                                            <label for="input-weight_unit_id" class="text-danger">{$message['weight_unit_id']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-tax_id">税类型</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="tax_id" value="{$data['tax_id']}" placeholder="税类型" id="input-tax_id" class="form-control" />
-                                        <if condition="isset($message['tax_id'])">
-                                            <label for="input-tax_id" class="text-danger">{$message['tax_id']}</label>
-                                        </if>
-                                    </div>
-                                </div>
-                                <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-is_on_sale">上架</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="is_on_sale" value="{$data['is_on_sale']}" placeholder="上架" id="input-is_on_sale" class="form-control" />
-                                        <if condition="isset($message['is_on_sale'])">
-                                            <label for="input-is_on_sale" class="text-danger">{$message['is_on_sale']}</label>
-                                        </if>
-                                    </div>
-                                </div>
+
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-sort">排序</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="sort" value="{$data['sort']}" placeholder="排序" id="input-sort" class="form-control" />
+                                        <input type="text" name="sort" value="{$data['sort']|default=0}" placeholder="排序" id="input-sort" class="form-control" />
                                         <if condition="isset($message['sort'])">
                                             <label for="input-sort" class="text-danger">{$message['sort']}</label>
                                         </if>
                                     </div>
                                 </div>
+
+                            </div>
+
+                            <!--描述面板-->
+                            <div id="tab-desc" class="tab-pane">
                                 <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-description">描述</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="description" value="{$data['description']}" placeholder="描述" id="input-description" class="form-control" />
+                                    <div class="col-sm-12">
+                                        <textarea name="description" id="input-description" class="form-control">{$data['description']}</textarea>
                                         <if condition="isset($message['description'])">
                                             <label for="input-description" class="text-danger">{$message['description']}</label>
                                         </if>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="tab-pane" id="tab-expand">
                                 <div class="form-group required">
-                                    <label class="col-sm-2 control-label" for="input-is_deleted">是否被删除</label>
+                                    <label class="col-sm-2 control-label" for="input-minimum">最少起售</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="is_deleted" value="{$data['is_deleted']}" placeholder="是否被删除" id="input-is_deleted" class="form-control" />
-                                        <if condition="isset($message['is_deleted'])">
-                                            <label for="input-is_deleted" class="text-danger">{$message['is_deleted']}</label>
+                                        <input type="text" name="minimum" value="{$data['minimum']|default=1}" placeholder="最少起售" id="input-minimum" class="form-control" />
+                                        <if condition="isset($message['minimum'])">
+                                            <label for="input-minimum" class="text-danger">{$message['minimum']}</label>
                                         </if>
                                     </div>
                                 </div>
+
                                 <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-is_shipping-yes">配送支持</label>
+                                    <div class="col-sm-10">
+                                        <label for="input-is_shipping-yes">
+                                            <input type="radio" name="is_shipping" value="1" id="input-is_shipping-yes" class="form-control" <if condition="!isset($data['is_shipping']) || $data['is_shipping'] eq '1'">checked</if> />
+                                            是</label>
+                                        &nbsp;&nbsp;
+                                        <label for="input-is_shipping-no">
+                                            <input type="radio" name="is_shipping" value="0" id="input-is_shipping-no" class="form-control" <if condition="$data['is_shipping'] eq '0'">checked</if> />
+                                            否</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-date_available">起售时间</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="date_available" value="{$data['date_available']}" placeholder="起售时间" id="input-date_available" class="form-control datetime" />
+                                        <if condition="isset($message['date_available'])">
+                                            <label for="input-date_available" class="text-danger">{$message['date_available']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+
+                                <div class="form-group ">
+                                    <label class="col-sm-2 control-label" for="input-length">尺寸(长宽高)</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" name="length" value="{$data['length']|default=0}" placeholder="长" id="input-length" class="form-control" />
+                                        <if condition="isset($message['length'])">
+                                            <label for="input-length" class="text-danger">{$message['length']}</label>
+                                        </if>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="text" name="width" value="{$data['width']|default=0}" placeholder="宽" id="input-width" class="form-control" />
+                                        <if condition="isset($message['width'])">
+                                            <label for="input-width" class="text-danger">{$message['width']}</label>
+                                        </if>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="text" name="height" value="{$data['height']|default=0}" placeholder="高" id="input-height" class="form-control" />
+                                        <if condition="isset($message['height'])">
+                                            <label for="input-height" class="text-danger">{$message['height']}</label>
+                                        </if>
+                                    </div>
+                                    <label class="col-sm-1 control-label" for="input-length_unit_id">单位</label>
+                                    <div class="col-sm-3">
+                                        <select name="length_unit_id" id="input-length_unit_id" class="form-control">
+                                            <option value="0">请选择</option>
+                                            <volist name="length_unit_list" id="length_unit">
+                                                <option value="{$length_unit['id']}" <if condition="$data['length_unit_id'] eq $length_unit['id']">selected</if> >{$length_unit['title']}</option>
+                                            </volist>
+                                        </select>
+                                        <if condition="isset($message['length_unit_id'])">
+                                            <label for="input-length_unit_id" class="text-danger">{$message['length_unit_id']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="input-weight">重量</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name="weight" value="{$data['weight']|default=0}" placeholder="重量" id="input-weight" class="form-control" />
+                                        <if condition="isset($message['weight'])">
+                                            <label for="input-weight" class="text-danger">{$message['weight']}</label>
+                                        </if>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <select name="weight_unit_id" id="input-weight_unit_id" class="form-control">
+                                            <option value="0">请选择</option>
+                                            <volist name="weight_unit_list" id="weight_unit">
+                                                <option value="{$weight_unit['id']}" <if condition="$data['weight_unit_id'] eq $weight_unit['id']">selected</if> >{$weight_unit['title']}</option>
+                                            </volist>
+                                        </select>
+                                        <if condition="isset($message['weight_unit_id'])">
+                                            <label for="input-weight_unit_id" class="text-danger">{$message['weight_unit_id']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="input-tax_id">税类型</label>
+                                    <div class="col-sm-10">
+                                        <select name="tax_id" id="input-tax_id" class="form-control">
+                                            <option value="0">请选择</option>
+                                            <volist name="tax_list" id="tax">
+                                                <option value="{$tax['id']}" <if condition="$data['tax_id'] eq $tax['id']">selected</if> >{$tax['title']}</option>
+                                            </volist>
+                                        </select>
+                                        <if condition="isset($message['tax_id'])">
+                                            <label for="input-tax_id" class="text-danger">{$message['tax_id']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-is_deleted-yes">是否被删除</label>
+                                    <div class="col-sm-10">
+                                        <label for="input-is_deleted-yes">
+                                            <input type="radio" name="is_deleted" value="1" id="input-is_deleted-yes" class="form-control" <if condition="$data['is_deleted'] eq '1'">checked</if> />
+                                            是</label>
+                                        &nbsp;&nbsp;
+                                        <label for="input-is_deleted-no">
+                                            <input type="radio" name="is_deleted" value="0" id="input-is_deleted-no" class="form-control" <if condition="!isset($data['is_deleted']) || $data['is_deleted'] eq '0'">checked</if> />
+                                            否</label>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="tab-pane" id="tab-linked">
+                                <div class="form-group">
                                     <label class="col-sm-2 control-label" for="input-brand_id">品牌</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="brand_id" value="{$data['brand_id']}" placeholder="品牌" id="input-brand_id" class="form-control" />
+                                        <select name="brand_id" id="input-brand_id" class="form-control">
+                                            <option value="0">请选择</option>
+                                            <volist name="brand_list" id="brand">
+                                                <option value="{$brand['id']}" <if condition="$data['brand_id'] eq $brand['id']">selected</if> >{$brand['title']}</option>
+                                            </volist>
+                                        </select>
                                         <if condition="isset($message['brand_id'])">
                                             <label for="input-brand_id" class="text-danger">{$message['brand_id']}</label>
                                         </if>
                                     </div>
                                 </div>
+
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-category_id">主分类</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="category_id" value="{$data['category_id']}" placeholder="主分类" id="input-category_id" class="form-control" />
+                                        <select name="category_id" id="input-category_id" class="form-control">
+                                            <volist name="category_list" id="category">
+                                                <option value="{$category['id']}" <if condition="$data['category_id'] eq $category['id']">selected</if> >{:str_repeat('&nbsp;', $category['level']*4)}{$category['title']}</option>
+                                            </volist>
+                                        </select>
                                         <if condition="isset($message['category_id'])">
                                             <label for="input-category_id" class="text-danger">{$message['category_id']}</label>
                                         </if>
                                     </div>
                                 </div>
+
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-categories_id">扩展分类</label>
+                                    <div class="col-sm-10">
+                                        <select multiple size="10" name="categories_id[]" id="input-categories_id" class="form-control">
+                                            <volist name="category_list" id="category">
+                                                <option value="{$category['id']}" <if condition="in_array($category['id'], $data['categories_id'])">selected</if> >{:str_repeat('&nbsp;', $category['level']*4)}{$category['title']}</option>
+                                            </volist>
+                                        </select>
+                                        <if condition="isset($message['categories_id'])">
+                                            <label for="input-categories_id" class="text-danger">{$message['categories_id']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="tab-pane" id="tab-seo">
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-meta_title">SEO标题</label>
                                     <div class="col-sm-10">
@@ -294,14 +378,12 @@
                                 <div class="form-group required">
                                     <label class="col-sm-2 control-label" for="input-meta_description">SEO描述</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="meta_description" value="{$data['meta_description']}" placeholder="SEO描述" id="input-meta_description" class="form-control" />
+                                        <textarea name="meta_description" id="input-meta_description" class="form-control" placeholder="SEO描述">{$data['meta_description']}</textarea>
                                         <if condition="isset($message['meta_description'])">
                                             <label for="input-meta_description" class="text-danger">{$message['meta_description']}</label>
                                         </if>
                                     </div>
                                 </div>
-
-
                             </div>
                         </div>
                     </form>
@@ -311,10 +393,28 @@
     </div>
 </block>
 
+<block name="appendCss">
+    <link href="__PUBLIC__/Back/datetimepicker/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" media="screen" />
+    <link href="__PUBLIC__/Back/summernote/summernote.css" type="text/css" rel="stylesheet" media="screen" />
+</block>
+
 <block name="appendJs">
     <script src="__PUBLIC__/Back/validate/jquery.validate.min.js"></script>
     <script src="__PUBLIC__/Back/validate/additional-methods.min.js"></script>
+    <script src="__PUBLIC__/Back/datetimepicker/moment.js"></script>
+    <script src="__PUBLIC__/Back/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="__PUBLIC__/Back/summernote/summernote.min.js"></script>
+    <script src="__PUBLIC__/Back/summernote/lang/summernote-zh-CN.js"></script>
 
+    <script>
+        $(function() {
+            $('.datetime').datetimepicker({
+                pickDate: true,
+                pickTime: true,
+                format: 'YYYY-MM-DD HH:mm',
+            });
+        });
+    </script>
     <script>
         // 表单验证
         $('#form-set').validate({
@@ -325,6 +425,15 @@
             messages: {
             },
             errorClass: 'text-danger',
+        });
+    </script>
+    <!--描述编辑器-->
+    <script>
+        $(function() {
+           $('#input-description').summernote({
+               height: 320,
+               lang: 'zh-CN',
+           });
         });
     </script>
 </block>
