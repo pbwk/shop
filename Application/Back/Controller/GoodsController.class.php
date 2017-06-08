@@ -124,9 +124,19 @@ class GoodsController extends Controller
                 // 当前正在编辑的数据
                 $data = $model->find($id);
             }
-            $this->assign('data', $data);
-            session('data', null);
 
+            session('data', null);
+            $this->assign('data', $data);
+
+            //分配相关数据
+            $this->assign('stock_status_list',M('StockStatus')->order('sort')->select());
+            $this->assign('stock_status_list', M('StockStatus')->order('sort')->select());
+            $this->assign('sku_list', M('Sku')->order('sort')->select());
+            $this->assign('length_unit_list', M('LengthUnit')->order('sort')->select());
+            $this->assign('weight_unit_list', M('WeightUnit')->order('sort')->select());
+            $this->assign('tax_list', M('Tax')->order('sort')->select());
+            $this->assign('brand_list', M('Brand')->order('sort')->select());
+            $this->assign('category_list', D('Category')->getTree());
             // 表单展示
             $this->display();
         }
