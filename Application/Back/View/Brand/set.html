@@ -1,0 +1,140 @@
+<extend name="Common/layout"/>
+
+<block name="content">
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button type="submit" form="form-set" data-toggle="tooltip" title="保存" class="btn btn-primary">
+                    <i class="fa fa-save"></i>
+                </button>
+                <a href="{:U['list']}" data-toggle="tooltip" title="取消" class="btn btn-default">
+                    <i class="fa fa-reply"></i>
+                </a>
+            </div>
+            <h1>品牌分类</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="{:U('Manage/index')}">首页</a>
+                </li>
+                <li>
+                    <a href="{:U('Brand/list')}">商品品牌</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-pencil"></i>
+                    添加商品品牌
+                </h3>
+            </div>
+            <div class="panel-body">
+                <if condition="is_null($id)">
+                    <form action="{:U('set')}" method="post" enctype="multipart/form-data" id="form-set" class="form-horizontal">
+                        <else />
+                        <form action="{:U('set', ['id'=>$id])}" method="post" enctype="multipart/form-data" id="form-set" class="form-horizontal">
+                            <!--id隐藏域-->
+                            <input type="hidden" name="id" value="{$id}">
+                </if>
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tab-general" data-toggle="tab">基本信息</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab-general">
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label" for="input-title">品牌名称</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="title" value="{$data['title']}" placeholder="品牌名称" id="input-title" class="form-control" data-check-url="{:U('titleUniqueCheck'),['id'=>$id]}" />
+                                    <if condition="isset($message['title'])">
+                                        <label for="input-title" class="text-danger">{$message['title']}</label>
+                                    </if>
+                                </div>
+                            </div>
+
+                            <div class="form-group ">
+                                <label class="col-sm-2 control-label" for="input-logo">品牌图像</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="logo" value="{$data['logo']}" placeholder="品牌图像" id="input-logo" class="form-control" />
+                                    <!--<label for="input-title" class="text-danger">分类错误</label>-->
+                                </div>
+                            </div>
+
+                            <div class="form-group ">
+                                <label class="col-sm-2 control-label" for="input-site">品牌官网</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="site" value="{$data['site']}" placeholder="品牌官网" id="input-site" class="form-control" />
+
+                                    <if condition="isset($message['site'])">
+                                        <label for="input-title" class="text-danger">{$message['site']}</label>
+                                    </if>                                </div>
+                            </div>
+                            <div class="form-group required" >
+                                <label class="col-sm-2 control-label" for="input-sort">排序</label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="sort" value="{$data['sort']|default=0}" placeholder="排序" id="input-sort" class="form-control" />
+
+                                    <if condition="isset($message['sort'])">
+                                        <label for="input-title" class="text-danger">{$message['sort']}</label>
+                                    </if>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</block>
+
+<block name="appendJs">
+    <script src="__PUBLIC__/Back/validate/jquery.validate.min.js"></script>
+    <script src="__PUBLIC__/Back/validate/additional-methods.min.js"></script>
+
+
+    <script>
+        //表单验证
+        $('#form-set').validate({
+            rules:{
+                title:{
+                    required:true,
+                    remote:$('#input-title').data('check-url')
+                },
+                site:{
+                  url:true
+                },
+                sort:{
+                    requeired:true,
+                    digits:true,
+                }
+            },
+            message:{
+
+                title: {
+                    required: '品牌名称必须',
+                    remote: '品牌已经存在'
+                },
+                site: {
+                    url: '官网地址必须为有效的URL'
+                },
+                sort: {
+                    required: '排序字段必须',
+                    digits: '排序需要使用数值'
+                }
+
+            },
+            errorClass:'text-danger',
+        });
+
+    </script>
+
+
+</block>
