@@ -3,7 +3,8 @@
 namespace Back\Controller;
 
 
-use Think\Controller;
+use Think\Auth;
+
 use Think\Page;
 
 /**
@@ -11,18 +12,30 @@ use Think\Page;
  * 后台商品管理控制器
  * @package Back\Controller
  */
-class GoodsController extends Controller
+class GoodsController extends CommonController
 {
 
     /**
-     * 列表
+     *回收站列表
      */
-    public function listAction()
+     function  trashAction()
+     {
+         $this->select('trash');
+     }
+    /**
+     * 查询列表的公共代码
+     */
+    function  select($type='list')
     {
+        $this->assign('type',$type);
+
         $model = M('Goods');
 
         // * 搜索处理
-        $cond = $filter = [];// 条件初始化
+        $filter = [];// 条件初始化
+
+        $cond = ['is_deleted'=>'list'==$type?'0':'1'];
+
         // 根据特殊的业务逻辑完成搜索条件的设置
         // 将搜索条件, 再次分配到模板中
         $this->assign('filter', $filter);
@@ -68,7 +81,110 @@ class GoodsController extends Controller
             ->select();
         $this->assign('rows', $rows);
         // 展示
-        $this->display();
+        $this->display('list');
+    }
+
+    /**
+     * 复制操作
+     */
+    public function copyAction($id)
+    {
+        $old_id = $id; //原来的商品ID
+
+        //复制，goods表
+        $old_row = M('Goods')->find($old_id);
+        //剔除主键
+        unset($old_row['id']);
+        //形成新的货号
+        $old_row['upc'] = ''; //暂时为空 等待编辑
+        D('Goods')->create($old_row);
+        $new_id = D('Goods')->add();
+
+        //复制 goods_attribute
+        $rows_ga = M('GoodsAttribute')->field('attribute_id,sort,value')
+            ->where(['goods_id'=>$old_id])->select();
+        $rows_ga_new = array_map(function ($row) use($new_id){
+            $row['goods_id'] = $new_id;
+            $row['created_at'] = $row['updatd_at'] = \time();
+            return $row;
+        },$rows_ga);
+        M('GoodsAttribute')->addAll($rows_ga_new);
+
+        //重定向到新商品的编辑页面
+        $this->redirect('list',['id'=>$new_id]);
+    }
+    /**
+     * 列表
+     */
+    public function listAction()
+    {
+        $auth = new Auth();
+        $result= $auth->check('Goods/list',session('admin.id'));
+//        dump($result);
+//        die();
+        $this->select('list');
+    }
+
+    public function attrAction($id)
+    {
+        $this->assign('id',$id);
+        $model = M('Goods');
+        $goods = $model->find($id);
+        if(IS_POST){
+            //更新 goods.type_id
+            $type_id = I('post.type_id',0);
+            $model->type_id = $type_id; //AR模式 操作属性 就是操作字段
+            $model->save();
+
+            $model_ga = M('GoodsAttribute');
+
+            // 删除非被type_id对应的商品属性关联
+            $attribute_id_list = M('Attribute')
+                ->where(['type_id'=>$type_id])
+//                ->fetchSql(true)
+                ->getField('id', true);
+            $model_ga
+                ->where([
+                    'goods_id' => $id,
+                    'attribute_id' => ['not in', $attribute_id_list]
+                ])
+                ->delete()
+            ;
+            $rows_ga = [];
+
+            foreach (I('post.ga',[]) as $attr){
+                //判断属性是否已存在
+                 $row = $model_ga->where(['goods_id'=>$id,'attribute_id'=>$attr['attribute_id']])->find();
+                if($row){
+                    //存在 更新即可
+                    $row['value'] = $attr['value'];
+                    $model_ga->save($row);
+                }else{
+                    //不存在属性与商品的对应
+                    $rows_ga[] = [
+                        'goods_id'=> $id,
+                        'attribute_id'=> $attr['attribute_id'],
+                        'value'=> $attr['value'],
+                    ];
+                }
+            }
+            //一次性插入结果
+            $model_ga->addAll($rows_ga);
+
+            $this->redirect('attr',['id'=>$id]);
+
+        }
+        else{
+            //GET
+            //设置 展示
+            //分配数据
+            $this->assign('goods',$goods);
+            $this->assign('type_list',M('Type')->order('sort')->select());
+
+            $this->display();
+        }
+
+
     }
 
     /**
@@ -77,6 +193,11 @@ class GoodsController extends Controller
      */
     public function setAction($id=null)
     {
+//
+//        $auth = new Auth();
+//        $result = $auth->check('Goods/set',session('admin.id'));
+//        dump($result);
+//        die();
         // 分配id到模板
         $this->assign('id', $id);
 
@@ -183,6 +304,30 @@ class GoodsController extends Controller
 
     }
 
+
+    /**
+     * ajax获取属性组内属性列表
+     * 响应 ajax事件的方法
+     */
+    public function attrlistAction()
+    {
+        $goods_id = I('request.goods_id',0);
+        $type_id = I('request.type_id',0);
+
+        #属性列表
+        $attr_list = M('Attribute')
+            ->field('a.id,a.title,ga.value ga_value,ga.id as ga_id')
+            ->alias('a')
+            ->join("left join __GOODS_ATTRIBUTE__ ga ON ga.attribute_id = a.id AND ga.goods_id = $goods_id")
+            ->where(['a.type_id'=>$type_id])
+            ->order('a.sort')
+            ->select();
+        //ajax 的json 响应
+        $this->ajaxReturn([
+            'error' => 0,
+            'data' => $attr_list
+        ]);
+    }
     /**
      * 批量操作: 删除
      */
@@ -190,10 +335,62 @@ class GoodsController extends Controller
     {
         // 获取需要操作的id列表
         $selected = I('post.selected', []);
+
+        if(empty($selected)){
+            $this->redirect(I('post.operate')=='delete'?'list':'trash');
+        }
         // 执行删除
         $cond['id'] = ['in', $selected];
-        M('Goods')->where($cond)->delete();
+        //确定操作
+        switch (I('post.operate')){
+            case 'delete':
 
-        $this->redirect('list');
+                $auth = new Auth();
+                $rule = 'goods-multi-delete';
+                $result =  $auth->check($rule,session('admin_id'));
+                if(!$result){
+                    //授权失败
+                    //提示
+                    $this->redirect('Admin/login');
+                }
+
+                //执行逻辑删除
+                M('Goods')->where($cond)->save(['is_deleted'=>1]);
+                $this->redirect('list');
+                break;
+
+            case 'remove':
+
+
+                $auth = new Auth();
+                $rule = 'goods-multi-remove';
+                $result =  $auth->check($rule,session('admin_id'));
+                if(!$result){
+                    //授权失败
+                    //提示
+                    $this->redirect('Admin/login');
+                }
+                //执行逻辑删除
+                M('Goods')->where($cond)->delete();
+                $this->redirect('trash');
+                break;
+
+            case 'undo':
+
+
+                $auth = new Auth();
+                $rule = 'goods-multi-undo';
+                $result =  $auth->check($rule,session('admin_id'));
+                if(!$result){
+                    //授权失败
+                    //提示
+                    $this->redirect('Admin/login');
+                }
+                M('Goods')->where($cond)->save(['is_deleted'=>0]);
+                $this->redirect('trash');
+                break;
+        }
+//        M('Goods')->where($cond)->save(['is_deleted'=>1]);
+//        $this->redirect('list');
     }
 }

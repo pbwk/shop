@@ -1,0 +1,123 @@
+<extend name="Common/layout" />
+
+<block name="content">
+    <div id="content">
+        <div class="page-header">
+            <div class="container-fluid">
+                <div class="pull-right">
+                    <button type="submit" form="form-set" data-toggle="tooltip" title="保存" class="btn btn-primary">
+                        <i class="fa fa-save"></i>
+                    </button>
+                    <a href="{:U('list')}" data-toggle="tooltip" title="取消" class="btn btn-default">
+                        <i class="fa fa-reply"></i>
+                    </a>
+                </div>
+                <h1>规则</h1>
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="{:U('Manage/index')}">首页</a>
+                    </li>
+                    <li>
+                        <a href="{:U('Brand/list')}">规则</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-pencil"></i>
+                        设置规则
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <if condition="is_null($id)">
+                        <form action="{:U('set')}" method="post" enctype="multipart/form-data" id="form-set" class="form-horizontal">
+                    <else />
+                        <form action="{:U('set', ['id'=>$id])}" method="post" enctype="multipart/form-data" id="form-set" class="form-horizontal">
+                        <!--id隐藏域-->
+                            <input type="hidden" name="id" value="{$id}">
+                    </if>
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#tab-general" data-toggle="tab">基本信息</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+
+                            <div class="tab-pane active" id="tab-general">
+
+                                                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-name">规则</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="name" value="{$data['name']}" placeholder="规则" id="input-name" class="form-control" />
+                                        <if condition="isset($message['name'])">
+                                            <label for="input-name" class="text-danger">{$message['name']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-title">标题</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="title" value="{$data['title']}" placeholder="标题" id="input-title" class="form-control" />
+                                        <if condition="isset($message['title'])">
+                                            <label for="input-title" class="text-danger">{$message['title']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-type">类型</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="type" value="{$data['type']|default=1}" placeholder="类型" id="input-type" class="form-control" />
+                                        <if condition="isset($message['type'])">
+                                            <label for="input-type" class="text-danger">{$message['type']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-status">状态</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="status" value="{$data['status']|default=1}" placeholder="状态" id="input-status" class="form-control" />
+                                        <if condition="isset($message['status'])">
+                                            <label for="input-status" class="text-danger">{$message['status']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-condition">附加条件</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="condition" value="{$data['condition']}" placeholder="附加条件" id="input-condition" class="form-control" />
+                                        <if condition="isset($message['condition'])">
+                                            <label for="input-condition" class="text-danger">{$message['condition']}</label>
+                                        </if>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+
+<block name="appendJs">
+    <script src="__PUBLIC__/Back/validate/jquery.validate.min.js"></script>
+    <script src="__PUBLIC__/Back/validate/additional-methods.min.js"></script>
+
+    <script>
+        // 表单验证
+        $('#form-set').validate({
+            // 填写自己的规则
+            rules: {
+            },
+            // 填写自己的错误信息
+            messages: {
+            },
+            errorClass: 'text-danger',
+        });
+    </script>
+</block>

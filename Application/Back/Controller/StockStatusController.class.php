@@ -3,7 +3,7 @@
 namespace Back\Controller;
 
 
-use Think\Controller;
+
 use Think\Page;
 
 /**
@@ -11,7 +11,7 @@ use Think\Page;
  * 后台库存状态管理控制器
  * @package Back\Controller
  */
-class StockStatusController extends Controller
+class StockStatusController extends CommonController
 {
 
     /**
@@ -140,9 +140,22 @@ class StockStatusController extends Controller
     {
         // 获取需要操作的id列表
         $selected = I('post.selected', []);
+
+        //通过预删除状态与商品形成内连接
+        $exists_ids =  M('StockStatus')->alias('ss')
+            //存在商品关联的才加上join
+            ->join('join __GOODS__ g On ss.id=g.stock_status_id')
+            ->distinct(true)
+            ->where(['ss.id'=>['in',$selected]])
+            ->field('ss.id')
+            ->select();
+
+        //降维(降低维度）
+        $exists_ids = array_map(function ($row) {return $row['id'];},$exists_ids);
         // 执行删除
-        $cond['id'] = ['in', $selected];
+        $cond['id'] = ['in', array_diff($selected,$exists_ids)];
         M('StockStatus')->where($cond)->delete();
+
 
         $this->redirect('list');
     }

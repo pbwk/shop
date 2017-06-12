@@ -7,11 +7,11 @@ namespace Back\Controller;
 use Think\Page;
 
 /**
- * Class LengthUnitController
- * 后台长度单位管理控制器
+ * Class AuthGroupController
+ * 后台组管理控制器
  * @package Back\Controller
  */
-class LengthUnitController extends CommonController
+class AuthGroupController extends CommonController
 {
 
     /**
@@ -19,7 +19,7 @@ class LengthUnitController extends CommonController
      */
     public function listAction()
     {
-        $model = M('LengthUnit');
+        $model = M('AuthGroup');
 
         // * 搜索处理
         $cond = $filter = [];// 条件初始化
@@ -80,12 +80,13 @@ class LengthUnitController extends CommonController
         // 分配id到模板
         $this->assign('id', $id);
 
-        $model = D('LengthUnit');
+        $model = D('AuthGroup');
         if (IS_POST) {
             // 处理添加的数据
             // 获取品牌(自定义)模型
             // 创建数据(数据校验, 自动填充, 从POST中绑定数据)
             if ($model->create()) {
+               $_POST['rules']= implode(',',I('post.rule_check',[]));
                 // 创建成功, 执行插入,
                 if (is_null($id)) {
                     // 添加
@@ -123,10 +124,14 @@ class LengthUnitController extends CommonController
                 // 编辑操作
                 // 当前正在编辑的数据
                 $data = $model->find($id);
+                //增加当前被选中的列表
+                $data['rule_checked'] = explode(',',$data['rules']);
             }
             $this->assign('data', $data);
             session('data', null);
 
+            //分配数据
+            $this->assign('rule_list',M('AuthRule')->order('name')->select());
             // 表单展示
             $this->display();
         }
@@ -142,7 +147,7 @@ class LengthUnitController extends CommonController
         $selected = I('post.selected', []);
         // 执行删除
         $cond['id'] = ['in', $selected];
-        M('LengthUnit')->where($cond)->delete();
+        M('AuthGroup')->where($cond)->delete();
 
         $this->redirect('list');
     }

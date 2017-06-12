@@ -5,12 +5,29 @@
         <div class="page-header">
             <div class="container-fluid">
                 <div class="pull-right">
-                    <a href="{:U('set')}" data-toggle="tooltip" title="新增" class="btn btn-primary">
-                        <i class="fa fa-plus"></i>
-                    </a>
-                    <button type="button" data-toggle="tooltip" title="删除" class="btn btn-danger" onclick="confirm('确认？') ? $('#form-list').submit() : false;">
-                        <i class="fa fa-trash-o"></i>
-                    </button>
+                    <if condition="'list' EQ $type">
+                        <a href="{:U('set')}" data-toggle="tooltip" title="新增" class="btn btn-primary <if condition="!authCheck('Goods/set')">disabled</if>">
+                            <i class="fa fa-plus"></i>
+                        </a>
+                        <button type="button" data-toggle="tooltip" title="删除" class="btn btn-danger <if condition="!authCheck('Goods/multi,goods-multi-delete', 'and')">disabled</if>" id="button-delete">
+                            <i class="fa fa-trash-o"></i>
+                        </button>
+                        <a href="{:U('trash')}" data-toggle="tooltip" title="回收站" class="btn btn-primary  <if condition="!authCheck('Goods/trash')">disabled</if>">
+                            <!--<i class="fa fa-plus"></i>-->
+                            回收站
+                        </a>
+                    <else />
+                        <button type="button" data-toggle="tooltip" title="彻底删除" class="btn btn-danger <if condition="!authCheck('Goods/multi,goods-multi-remove', 'and')">disabled</if>" id="button-remove">
+                            <i class="fa fa-trash-o"></i>
+                        </button>
+                        <button type="button" data-toggle="tooltip" title="恢复" class="btn btn-danger <if condition="!authCheck('Goods/multi,goods-multi-undo', 'and')">disabled</if>" id="button-undo">
+                            <i class="fa">恢复</i>
+                        </button>
+                        <a href="{:U('list')}" data-toggle="tooltip" title="商品列表" class="btn btn-primary  <if condition="!authCheck('Goods/list')">disabled</if>">
+                            <!--<i class="fa fa-plus"></i>-->
+                            商品列表
+                        </a>
+                    </if>
                 </div>
                 <h1>商品</h1>
                 <ul class="breadcrumb">
@@ -28,7 +45,11 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         <i class="fa fa-list"></i>
-                        商品列表
+                        <if condition="'list' EQ $type">
+                            商品列表
+                        <else />
+                            商品回收站
+                        </if>
                     </h3>
                 </div>
                 <div class="panel-body">
@@ -55,6 +76,7 @@
                     <!--</div>-->
 
                     <form action="{:U('multi')}" method="post" enctype="multipart/form-data" id="form-list">
+                        <input type="hidden" id="input-operate" name="operate" value="">
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover">
                                 <thead>
@@ -100,9 +122,18 @@
                                         <td class="text-left">{$row['stock_status_id']}</td>                                    <td class="text-left">{$row['price']}</td>                                    <td class="text-left">{$row['is_on_sale']}</td>                                    <td class="text-left">{$row['sort']}</td>                                    <td class="text-left">{$row['brand_id']}</td>                                    <td class="text-left">{$row['category_id']}</td>
 
                                     <td class="text-right">
-                                        <a href="{:U('set', ['id'=>$row['id']])}" data-toggle="tooltip" title="编辑" class="btn btn-primary">
-                                            <i class="fa fa-pencil"></i>
-                                        </a>
+
+                                        <if condition="'list' EQ $type">
+                                            <a href="{:U('set', ['id'=>$row['id']])}" data-toggle="tooltip" title="编辑" class="btn btn-primary <if condition="!authCheck('Goods/set')">disabled</if>">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                            <a href="{:U('attr', ['id'=>$row['id']])}" data-toggle="tooltip" title="属性" class="btn btn-primary <if condition="!authCheck('Goods/attr')">disabled</if>">
+                                            <i class="fa fa-cubes">属</i>
+                                            </a>
+                                            <a href="{:U('copy', ['id'=>$row['id']])}" data-toggle="tooltip" title="复制" class="btn btn-primary <if condition="!authCheck('Goods/copy')">disabled</if>">
+                                            <i class="fa">复</i>
+                                            </a>
+                                        </if>
                                     </td>
                                 </tr>
                                 </volist>
@@ -127,6 +158,44 @@
             // 伪元素 + 属性 选择器
             $(':checkbox[name="selected[]"]').prop('checked', $(this).prop('checked'));
             // 修改属性 在jquery共三个方法. attr, data, prop
+        });
+    </script>
+
+    <!--删除相关事件-->
+    <script>
+        $(function() {
+            $('#button-delete').click(function(evt) {
+                // 判断是否选择
+                // 伪元素 属性 伪类
+                if($(':checkbox[name="selected[]"]:checked').size() < 1) {
+                    // 没有被选择
+                    alert('选择需要操作的行');
+                    return ;
+                }
+
+                var result = confirm('确认删除? 在回收站中可恢复');
+                if (result) {
+                    $('#input-operate').val('delete');
+                    $('#form-list').submit();
+                }
+                evt.preventDefault();
+            });
+            $('#button-remove').click(function(evt) {
+                var result = confirm('确认彻底删除? 不可恢复');
+                if (result) {
+                    $('#input-operate').val('remove');
+                    $('#form-list').submit();
+                }
+                evt.preventDefault();
+            });
+            $('#button-undo').click(function(evt) {
+                var result = confirm('确认恢复?');
+                if (result) {
+                    $('#input-operate').val('undo');
+                    $('#form-list').submit();
+                }
+                evt.preventDefault();
+            });
         });
     </script>
 </block>

@@ -3,7 +3,7 @@
 namespace Back\Controller;
 
 
-use Think\Controller;
+
 use Think\Page;
 
 /**
@@ -11,7 +11,7 @@ use Think\Page;
  * 后台税类型管理控制器
  * @package Back\Controller
  */
-class TaxController extends Controller
+class TaxController extends CommonController
 {
 
     /**

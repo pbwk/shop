@@ -2,14 +2,14 @@
 
 namespace Back\Controller;
 
-use Think\Controller;
+
 
 /**
  * Class MakerController
  * 生成功能控制器
  * @package Back\Controller
  */
-class MakerController extends Controller
+class MakerController extends CommonController
 {
 
     public function tableAction()

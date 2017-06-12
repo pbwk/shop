@@ -3,7 +3,7 @@
 namespace Back\Controller;
 
 
-use Think\Controller;
+
 use Think\Page;
 
 /**
@@ -11,7 +11,7 @@ use Think\Page;
  * 后台库存单位管理控制器
  * @package Back\Controller
  */
-class SkuController extends Controller
+class SkuController extends CommonController
 {
 
     /**

@@ -4,7 +4,7 @@ namespace Back\Controller;
 
 
 use Back\Model\CategoryModel;
-use Think\Controller;
+
 use Think\Page;
 
 /**
@@ -12,7 +12,7 @@ use Think\Page;
  * 后台分类管理控制器
  * @package Back\Controller
  */
-class CategoryController extends Controller
+class CategoryController extends CommonController
 {
 
     /**
@@ -54,6 +54,10 @@ class CategoryController extends Controller
 
         $model = D('Category');
         if (IS_POST) {
+            if($id==1)
+            {
+                $this->redirect('Admin/login');
+            }
             // 处理添加的数据
             // 获取品牌(自定义)模型
             // 创建数据(数据校验, 自动填充, 从POST中绑定数据)
@@ -123,6 +127,12 @@ class CategoryController extends Controller
         // 执行删除
         $cond['id'] = ['in', $selected];
         M('Category')->where($cond)->delete();
+
+        //id == 1 是 未分类
+        M('Goods')->where(['category_id'=>['in',$selected]])->save(['category_id'=>1]);
+
+        //删除与当前分类相关的商品分类
+        M('CategoryGoods')->where(['category_id'=>['in',$selected]])->delete();
 
         // 删除缓存
         $this->clearCache();

@@ -7,19 +7,59 @@ namespace Back\Controller;
 use Think\Page;
 
 /**
- * Class LengthUnitController
- * 后台长度单位管理控制器
+ * Class AdminController
+ * 后台管理员管理控制器
  * @package Back\Controller
  */
-class LengthUnitController extends CommonController
+class AdminController extends CommonController
 {
 
+    public  function loginAction()
+    {
+        if(IS_POST){
+            //验证
+            $model = D('Admin');
+           $admin= $model->checkAdmin(I('post.username','','trim'),I('post.password','','trim'));
+            //通过 管理员信息
+            if($admin){
+                session('admin',$admin);
+                $this->redirect('Manage/index');
+            }
+
+            // 失败
+            session('message', '登录信息错误');
+            session('data', $_POST);
+            $this->redirect('login');
+
+        }else{
+
+            // 可能存在的错误数据和错误消息, 分配(assign)到模板中
+            $this->assign('message', session('message') ? session('message') : []);
+            // 一次性的会话数据, 立即删除(阅后即焚)
+            session('message', null);
+            // 用户填写的错误数据
+            $data = session('data') ? session('data') : [];
+            $this->assign('data', $data);
+            session('data', null);
+            $this->display();
+        }
+    }
+
+    /**
+     * 退出
+     */
+    public  function  logoutAction()
+    {
+        //删除登陆标志
+        session('admin',null);
+        $this->redirect('login');
+    }
     /**
      * 列表
      */
     public function listAction()
     {
-        $model = M('LengthUnit');
+        $model = M('Admin');
 
         // * 搜索处理
         $cond = $filter = [];// 条件初始化
@@ -80,7 +120,7 @@ class LengthUnitController extends CommonController
         // 分配id到模板
         $this->assign('id', $id);
 
-        $model = D('LengthUnit');
+        $model = D('Admin');
         if (IS_POST) {
             // 处理添加的数据
             // 获取品牌(自定义)模型
@@ -142,7 +182,7 @@ class LengthUnitController extends CommonController
         $selected = I('post.selected', []);
         // 执行删除
         $cond['id'] = ['in', $selected];
-        M('LengthUnit')->where($cond)->delete();
+        M('Admin')->where($cond)->delete();
 
         $this->redirect('list');
     }

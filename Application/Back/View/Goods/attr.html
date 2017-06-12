@@ -1,0 +1,120 @@
+<extend name="Common/layout"/>
+
+<block name="content">
+    <div id="content">
+        <div class="page-header">
+            <div class="container-fluid">
+                <div class="pull-right">
+                    <button type="submit" form="form-set" data-toggle="tooltip" title="保存" class="btn btn-primary">
+                        <i class="fa fa-save"></i>
+                    </button>
+                    <a href="{:U('list')}" data-toggle="tooltip" title="取消" class="btn btn-default">
+                        <i class="fa fa-reply"></i>
+                    </a>
+                </div>
+                <h1>属性</h1>
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="{:U('Manage/index')}">首页</a>
+                    </li>
+                    <li>
+                        <a href="{:U('list')}">商品</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-pencil"></i>
+                        设置{$goods['title']|htmlspecialchars}属性
+                    </h3>
+                </div>
+                <div class="panel-body">
+
+                        <form action="{:U('attr',['id'=>$id])}" method="post" enctype="multipart/form-data" id="form-set" class="form-horizontal">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tab-general" data-toggle="tab">商品属性</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+
+                        <div class="tab-pane active" id="tab-general">
+
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label" for="input-type_id">属性组</label>
+                                <div class="col-sm-10">
+                                    <select name="type_id" id="input-type_id" class="form-control" data-url="{:U('attrlist')}" data-goods_id="{$id}">
+                                        <option value="0">请选择</option>
+                                        <volist name="type_list" id="type">
+                                            <option value="{$type['id']}" <if condition="$type['id'] EQ $goods['type_id']">selected</if>>
+                                            {$type['title']}
+                                            </option>
+                                        </volist>
+                                    </select>
+                                    <if condition="isset($message['type_id'])">
+                                        <label for="input-type_id" class="text-danger">{$message['type_id']}</label>
+                                    </if>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+
+<block name="appendJs">
+    <script>
+        //ajax获取所选属性组对应的全部属性
+        //如果存在对应的值则同时获取
+
+
+        function getAttr() {
+            if('0' == $('#input-type_id').val()){
+                //位于请选择  不需要完成属性获取
+                return;
+            }
+            //选择了特定属性
+            var url=$('#input-type_id').data('url');
+            var data = {
+                goods_id:$('#input-type_id').data('goods_id'),
+                type_id:$('#input-type_id').val(),
+            };
+        $.get(url,data,function (resp) {
+//            console.log(resp);
+            //处理响应数据
+            if(resp.error == 0){
+                //没有错误
+                var html='';
+                $.each(resp.data,function (i,attr) {
+                    html +=' <div class="form-group required">'+
+                        '<label class="col-sm-2 control-label" for="input-upc">'+attr.title+ '</label>'+
+                       ' <div class="col-sm-10">'+
+                            '<input type="hidden" name="ga['+i+'][attribute_id]" value="'+ attr.id+'">'+
+                        '<input type="text" name="ga['+i+'][value]" value="'+(attr.ga_value||'')+'" placeholder="'+attr.title+'" id="input-upc" class="form-control" />'+
+                    '</div>'+
+                    '</div>';
+                });
+                //追加到表单中
+                $('#tab-general>div.form-group:gt(0)').remove();
+                $('#tab-general').append(html);
+            }
+        },'json');
+        }
+        //在页面加载后 和属性发生改变是调用事件
+        $(function () {
+            //初始化
+            getAttr();
+            //select 的 change 事件
+            $('#input-type_id').change(function (evt) {
+                getAttr();
+                evt.preventDefault();
+            });
+        });
+    </script>
+</block>

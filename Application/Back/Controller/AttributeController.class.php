@@ -7,11 +7,11 @@ namespace Back\Controller;
 use Think\Page;
 
 /**
- * Class LengthUnitController
- * 后台长度单位管理控制器
+ * Class AttributeController
+ * 后台属性管理控制器
  * @package Back\Controller
  */
-class LengthUnitController extends CommonController
+class AttributeController extends CommonController
 {
 
     /**
@@ -19,11 +19,16 @@ class LengthUnitController extends CommonController
      */
     public function listAction()
     {
-        $model = M('LengthUnit');
+        $model = M('Attribute');
 
         // * 搜索处理
         $cond = $filter = [];// 条件初始化
         // 根据特殊的业务逻辑完成搜索条件的设置
+        $type_id= I('get.filter_type_id',null);
+        if($type_id){
+            $cond['type_id'] = $type_id;
+            $filter['filter_type_id'] = $type_id;
+        }
         // 将搜索条件, 再次分配到模板中
         $this->assign('filter', $filter);
 
@@ -80,7 +85,7 @@ class LengthUnitController extends CommonController
         // 分配id到模板
         $this->assign('id', $id);
 
-        $model = D('LengthUnit');
+        $model = D('Attribute');
         if (IS_POST) {
             // 处理添加的数据
             // 获取品牌(自定义)模型
@@ -127,6 +132,8 @@ class LengthUnitController extends CommonController
             $this->assign('data', $data);
             session('data', null);
 
+            //分配数据
+            $this->assign('type_list',M('Type')->order('sort')->select());
             // 表单展示
             $this->display();
         }
@@ -142,7 +149,7 @@ class LengthUnitController extends CommonController
         $selected = I('post.selected', []);
         // 执行删除
         $cond['id'] = ['in', $selected];
-        M('LengthUnit')->where($cond)->delete();
+        M('Attribute')->where($cond)->delete();
 
         $this->redirect('list');
     }

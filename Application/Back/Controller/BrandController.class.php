@@ -6,8 +6,8 @@
  * Time: 下午1:12
  */
 namespace Back\Controller;
-use Think\Controller;
-class BrandController extends Controller
+
+class BrandController extends CommonController
 {
     public function setAction($id=null)
     {
@@ -157,6 +157,12 @@ class BrandController extends Controller
         // 执行删除
         $cond['id'] = ['in', $selected];
         M('Brand')->where($cond)->delete();
+
+        //取消商品关联
+        M('Goods')
+            ->where(['brand_id'=>['in', $selected]])
+            ->save(['brand_id'=>0])
+        ;
 
         $this->redirect('list');
     }

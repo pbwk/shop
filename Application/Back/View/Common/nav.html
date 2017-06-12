@@ -16,18 +16,47 @@
                 <span>管理首页</span>
             </a>
         </li>
+        <if condition="authCheck('Goods/list,Category/list,Brand/list')">
         <li id="catalog">
             <a class="parent">
                 <i class="fa fa-tags fa-fw"></i>
                 <span>商品目录</span>
             </a>
             <ul>
+                <if condition="authCheck('Category/list')">
                 <li>
-                    <a href="">商品分类</a>
+                    <a href="{:U('Category/list')}">商品分类</a>
                 </li>
+
+                    <if condtion="authCheck('Goods/list')">
                 <li>
-                    <a href="">商品管理</a>
+                    <a href="{:U('Goods/list')}">商品管理</a>
                 </li>
+                    </if>
+
+                <if condition="authCheck('Brand/list')">
+                    <li>
+                        <a href="{:U('Brand/list')}">品牌管理</a>
+                    </li>
+                </if>
+
+                    <if condition="authCheck('Attribute/list,Type/list')">
+                        <li>
+                            <a class="parent">商品属性</a>
+                            <ul>
+                                <if condition="authCheck('Attribute/list')">
+                                    <li>
+                                        <a href="{:U('Attribute/list')}">商品属性</a>
+                                    </li>
+                                </if>
+                                <if condition="authCheck('Type/list')">
+                                    <li>
+                                        <a href="{:U('Type/list')}">属性组</a>
+                                    </li>
+                                </if>
+                            </ul>
+                        </li>
+                    </if>
                 <li class="hidden">
                     <a href="">分期付款</a>
                 </li>
@@ -49,9 +78,6 @@
                     <a href="">商品选项</a>
                 </li>
                 <li>
-                    <a href="">品牌管理</a>
-                </li>
-                <li>
                     <a href="">下载设置</a>
                 </li>
                 <li>
@@ -62,6 +88,7 @@
                 </li>
             </ul>
         </li>
+        </if>
         <li id="extension">
             <a class="parent">
                 <i class="fa fa-puzzle-piece fa-fw"></i>

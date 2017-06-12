@@ -3,7 +3,7 @@
 namespace Back\Controller;
 
 
-use Think\Controller;
+
 use Think\Page;
 
 /**
@@ -11,7 +11,7 @@ use Think\Page;
  * 后台会员管理控制器
  * @package Back\Controller
  */
-class MemberController extends Controller
+class MemberController extends CommonController
 {
 
     /**

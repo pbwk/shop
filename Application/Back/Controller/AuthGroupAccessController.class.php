@@ -7,11 +7,11 @@ namespace Back\Controller;
 use Think\Page;
 
 /**
- * Class LengthUnitController
- * 后台长度单位管理控制器
+ * Class AuthGroupAccessController
+ * 后台用户与组管理控制器
  * @package Back\Controller
  */
-class LengthUnitController extends CommonController
+class AuthGroupAccessController extends CommonController
 {
 
     /**
@@ -19,7 +19,7 @@ class LengthUnitController extends CommonController
      */
     public function listAction()
     {
-        $model = M('LengthUnit');
+        $model = M('AuthGroupAccess');
 
         // * 搜索处理
         $cond = $filter = [];// 条件初始化
@@ -80,7 +80,7 @@ class LengthUnitController extends CommonController
         // 分配id到模板
         $this->assign('id', $id);
 
-        $model = D('LengthUnit');
+        $model = D('AuthGroupAccess');
         if (IS_POST) {
             // 处理添加的数据
             // 获取品牌(自定义)模型
@@ -142,7 +142,7 @@ class LengthUnitController extends CommonController
         $selected = I('post.selected', []);
         // 执行删除
         $cond['id'] = ['in', $selected];
-        M('LengthUnit')->where($cond)->delete();
+        M('AuthGroupAccess')->where($cond)->delete();
 
         $this->redirect('list');
     }

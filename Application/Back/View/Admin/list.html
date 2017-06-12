@@ -1,0 +1,112 @@
+<extend name="Common/layout" />
+
+<block name="content">
+    <div id="content">
+        <div class="page-header">
+            <div class="container-fluid">
+                <div class="pull-right">
+                    <a href="{:U('set')}" data-toggle="tooltip" title="新增" class="btn btn-primary">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                    <button type="button" data-toggle="tooltip" title="删除" class="btn btn-danger" onclick="confirm('确认？') ? $('#form-list').submit() : false;">
+                        <i class="fa fa-trash-o"></i>
+                    </button>
+                </div>
+                <h1>管理员</h1>
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="{:U('Manage/index')}">首页</a>
+                    </li>
+                    <li>
+                        <a href="{:U('list')}">管理员</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-list"></i>
+                        管理员列表
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <!-- 搜索需要自己完成 -->
+                    <!--<div class="well">-->
+                        <!--<form action="{:U('list')}" method="get">-->
+                            <!--<div class="row">-->
+                                <!--<div class="col-sm-12">-->
+                                    <!--<div class="form-group">-->
+                                        <!--<label class="control-label" for="input-filter_keyword">关键字</label>-->
+                                        <!--<input type="text" name="filter_keyword" value="{$filter['filter_keyword']}" placeholder="关键字" id="input-filter_keyword" class="form-control" />-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<div class="row">-->
+                                <!--<div class="col-sm-12">-->
+                                    <!--<button type="submit" id="button-filter" class="btn btn-primary pull-right">-->
+                                        <!--<i class="fa fa-search"></i>-->
+                                        <!--筛选-->
+                                    <!--</button>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</form>-->
+                    <!--</div>-->
+
+                    <form action="{:U('multi')}" method="post" enctype="multipart/form-data" id="form-list">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <td style="width: 1px;" class="text-center"><input type="checkbox" id="input-check-all"/></td>
+
+                                                                        <td class="text-left">
+                                        <a href="{:Uorder('list', $filter, $order, 'id')}" class="{:classOrder($order, 'id')}">ID</a>
+                                    </td>
+                                    <td class="text-left">
+                                        <a href="{:Uorder('list', $filter, $order, 'username')}" class="{:classOrder($order, 'username')}">管理员</a>
+                                    </td>
+
+
+                                    <td class="text-right">操作</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <volist name="rows" id="row">
+                                    <tr>
+                                    <td class="text-center"><input type="checkbox" name="selected[]" value="{$row['id']}" /></td>
+
+                                                                        <td class="text-left">{$row['id']}</td>                                    <td class="text-left">{$row['username']}</td>
+
+                                    <td class="text-right">
+                                        <a href="{:U('set', ['id'=>$row['id']])}" data-toggle="tooltip" title="编辑" class="btn btn-primary">
+                                            <i class="fa fa-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </volist>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+
+                    <div class="row">
+                        {$page_html}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+
+<block name="appendJs">
+    <script>
+        $('#input-check-all').click(function(evt){
+            // 找到需要操作的checkbox, 与操作的全选checkbox的状态一致
+            // 伪元素 + 属性 选择器
+            $(':checkbox[name="selected[]"]').prop('checked', $(this).prop('checked'));
+            // 修改属性 在jquery共三个方法. attr, data, prop
+        });
+    </script>
+</block>
